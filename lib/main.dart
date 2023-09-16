@@ -18,12 +18,12 @@ class Calculator extends StatelessWidget {
               brightness: Brightness.dark,
               primary: Colors.white,
               onPrimary: Colors.black,
-              secondary: Colors.black26,
-              onSecondary: Colors.white70,
-              error: Colors.black12,
+              secondary: Colors.white70,
+              onSecondary: Colors.black26,
+              error: Colors.white38,
               onError: Colors.deepOrangeAccent,
-              background: Colors.white38,
-              onBackground: Colors.white,
+              background: Colors.white,
+              onBackground: Colors.white38,
               surface: Colors.white60,
               onSurface: Colors.white),
           textTheme: GoogleFonts.pressStart2pTextTheme()),
@@ -42,10 +42,12 @@ class CalculatorHomePage extends StatefulWidget {
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String currentExpression = '';
 
-  void _handleButtonTap(String buttonText) {
+  void _handleButtonTap(String buttonText,) {
     const List<String> operations = ['C', 'DEL', '±', '÷', '×', '-', '+', '='];
     if (operations.contains(buttonText)) {
-      if (buttonText == 'C') {
+      if (currentExpression.isEmpty) {
+        return;
+      } else if (buttonText == 'C') {
         setState(() {
           currentExpression = '';
         });
@@ -88,7 +90,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
         builder: (BuildContext context, BoxConstraints constrains) {
           var availableHeight = constrains.maxHeight - MediaQuery.of(context).viewPadding.top - MediaQuery.of(context).viewPadding.bottom;
           var textBoxSize = availableHeight / 3;
-          var keyboardSize = 2 * availableHeight / 3;
+          var keyboardSize = availableHeight * 2 / 3;
           var buttonSize = Size(constrains.maxWidth / buttons.first.length, keyboardSize / buttons.length);
           return Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).viewPadding.top),
