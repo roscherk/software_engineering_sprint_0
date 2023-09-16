@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CalcButton extends StatelessWidget {
   final String buttonText;
   final Size size;
-  final onPressed;
+  final void Function() onPressed;
   final Color borderColor;
   final Color textColor;
 

@@ -44,7 +44,6 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
 
   void _handleButtonTap(String buttonText) {
     const List<String> operations = ['C', 'DEL', '±', '÷', '×', '-', '+', '='];
-    // String lastChar = currentExpression.substring(0, currentExpression.length - 1);
     if (operations.contains(buttonText)) {
       if (buttonText == 'C') {
         setState(() {
@@ -83,23 +82,14 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
       ['1', '2', '3', '+',],
       ['0', '(', ')', '=']
     ];
-    // debugPrint('viewPadding.top: ${MediaQuery.of(context).viewPadding.top}');
-    // debugPrint('viewInsets.bottom: ${MediaQuery.of(context).padding.bottom}');
-    // var style = ElevatedButton.styleFrom(
-    //   shape: const CircleBorder(),
-    //   backgroundColor: Colors.transparent,
-    //   textStyle: const TextStyle(fontSize: 60),
-    // );
     return Scaffold(
-      // backgroundColor: Colors.black,
+      backgroundColor: Colors.black,
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constrains) {
           var availableHeight = constrains.maxHeight - MediaQuery.of(context).viewPadding.top - MediaQuery.of(context).viewPadding.bottom;
           var textBoxSize = availableHeight / 3;
           var keyboardSize = 2 * availableHeight / 3;
           var buttonSize = Size(constrains.maxWidth / buttons.first.length, keyboardSize / buttons.length);
-          // debugPrint(availableHeight.toString());
-          // debugPrint(buttonSize.toString());
           return Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).viewPadding.top),
             child: Column(
