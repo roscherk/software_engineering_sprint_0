@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
 
@@ -26,6 +25,6 @@ class HistoryPage extends StatelessWidget {
       )
       // Textbox for expression_list
               // Padding()
-    );           
+    );
   }
 }
