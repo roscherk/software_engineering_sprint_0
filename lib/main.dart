@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sprint_0_calculator/calc_button.dart';
+import 'package:sprint_0_calculator/history.dart';
 
 void main() {
-  var test = SystemUiOverlayStyle.dark.copyWith(systemNavigationBarColor: Colors.transparent);
-  SystemChrome.setSystemUIOverlayStyle(test);
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+          systemNavigationBarColor: Colors.transparent));
   runApp(const Calculator());
 }
 
@@ -18,7 +20,9 @@ class Calculator extends StatelessWidget {
       title: 'Calculator',
       theme: ThemeData(
           colorScheme: const ColorScheme.dark().copyWith(primary: Colors.white),
-          textTheme: GoogleFonts.pressStart2pTextTheme()),
+          textTheme: GoogleFonts.pressStart2pTextTheme().apply(
+              bodyColor: Colors.white,
+              displayColor: Colors.white)),
       home: const CalculatorHomePage(),
     );
   }
@@ -34,7 +38,6 @@ class CalculatorHomePage extends StatefulWidget {
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String currentExpression = '';
 
-  // TODO: добавить кнопку, которая ведёт в меню просмотра истории запросов
   @override
   Widget build(BuildContext context) {
     const List<List<String>> buttons = [
@@ -62,32 +65,44 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                   height: textBoxSize,
                   child: Stack(
                     children: [
+                      // History button
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 8, 18, 0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Align(
                           alignment: Alignment.topLeft,
-                          child: Text(' HISTORY', style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Colors.white)),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const HistoryPage()),
+                                );
+                              },
+                              style: TextButton.styleFrom(
+                                shape: const BeveledRectangleBorder(),
+                                side: const BorderSide(color: Colors.transparent),
+                              ),
+                              child: Text('HISTORY', style: Theme.of(context).textTheme.headlineSmall)),
                         ),
                       ),
+                      // Textbox for expression
                       Padding(
                         padding: const EdgeInsets.all(8),
                           child: Align(
                             alignment: Alignment.bottomRight,
-                            child: SingleChildScrollView(
+                            child: SingleChildScrollView( // Textfield
                               scrollDirection: Axis.horizontal,
                               reverse: true,
                               child: Text(
                                 currentExpression,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displaySmall!
-                                    .copyWith(color: Colors.white),
+                                style: Theme.of(context).textTheme.displaySmall,
                               ),
                             ),
                           )
-                      ),]
+                      ),
+                    ]
                   )
                 ),
+                // Keyboard
                 SizedBox(
                     width: constrains.maxWidth,
                     height: keyboardSize,
@@ -146,13 +161,18 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     setState(() {
         currentExpression += buttonText;
     });
-
   }
-  
+
   void _handleButtonLongPress(String buttonText,) {
     if (buttonText == 'C') {
       setState(() {
         currentExpression = '';
+      });
+    }
+    if (currentExpression == '42' && buttonText == '=') {
+      setState(() {
+        // Theme.of(context).textTheme = GoogleFonts.textMeOneTextTheme;
+        currentExpression = 'heapof&gvozd design';
       });
     }
   }
