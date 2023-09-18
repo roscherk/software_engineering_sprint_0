@@ -19,9 +19,10 @@ class Calculator extends StatelessWidget {
           colorScheme: const ColorScheme.dark().copyWith(
               primary: Colors.white,
               background: Colors.black),
-          textTheme: GoogleFonts.pressStart2pTextTheme().apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white)),
+              textTheme: GoogleFonts.pressStart2pTextTheme().apply(
+                  bodyColor: Colors.white,
+                  displayColor: Colors.white)
+      ),
       home: const CalculatorHomePage(),
     );
   }
@@ -36,12 +37,14 @@ class CalculatorHomePage extends StatefulWidget {
 
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String currentExpression = '';
+  TextStyle? expressionStyle;
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle( // set system navigation bar color to ours
         SystemUiOverlayStyle.dark.copyWith(
             systemNavigationBarColor: Theme.of(context).colorScheme.background));
+    expressionStyle ??= Theme.of(context).textTheme.displaySmall;
     const List<List<String>> buttons = [
       ['C', '(', ')', '÷',],
       ['7', '8', '9', '×',],
@@ -74,10 +77,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                           alignment: Alignment.topLeft,
                           child: TextButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const HistoryPage()),
-                                );
+                                _navigateToHistory();
                               },
                               style: TextButton.styleFrom(
                                 shape: const BeveledRectangleBorder(),
@@ -88,7 +88,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                       ),
                       // Textbox for expression
                       Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8.0),
                           child: Align(
                             alignment: Alignment.bottomRight,
                             child: SingleChildScrollView( // Textfield
@@ -96,7 +96,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                               reverse: true,
                               child: Text(
                                 currentExpression,
-                                style: Theme.of(context).textTheme.displaySmall,
+                                style: expressionStyle,
                               ),
                             ),
                           )
@@ -137,6 +137,18 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     );
   }
 
+  Future<void> _navigateToHistory() async {
+    var result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HistoryPage()),
+    );
+    if (result.toString().isNotEmpty) {
+      setState(() {
+        currentExpression = result.toString();
+      });
+    }
+  }
+
   void _handleButtonPress(String buttonText,) {
     const List<String> operations = ['C', '±', '÷', '×', '-', '+', '='];
     bool endsWithOperator = currentExpression.isNotEmpty && operations.sublist(3).contains(currentExpression.substring(currentExpression.length - 1));
@@ -172,10 +184,18 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
       });
     }
     if (currentExpression == '42' && buttonText == '=') {
-      setState(() {
-        // Theme.of(context).textTheme = GoogleFonts.textMeOneTextTheme;
-        currentExpression = 'heapof&gvozd design';
-      });
+      if (expressionStyle == Theme.of(context).textTheme.displaySmall) {
+        expressionStyle = Theme.of(context).textTheme.titleMedium;
+        setState(() {
+          // Theme.of(context).textTheme = GoogleFonts.textMeOneTextTheme;
+          currentExpression = 'heapof&gvozd design';
+        });
+      } else {
+        setState(() {
+          expressionStyle = Theme.of(context).textTheme.displaySmall;
+        });
+      }
+      // expressionStyle = currentStyle;
     }
   }
 
