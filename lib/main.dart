@@ -5,9 +5,6 @@ import 'package:sprint_0_calculator/calc_button.dart';
 import 'package:sprint_0_calculator/history.dart';
 
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle.dark.copyWith(
-          systemNavigationBarColor: Colors.transparent));
   runApp(const Calculator());
 }
 
@@ -19,7 +16,9 @@ class Calculator extends StatelessWidget {
     return MaterialApp(
       title: 'Calculator',
       theme: ThemeData(
-          colorScheme: const ColorScheme.dark().copyWith(primary: Colors.white),
+          colorScheme: const ColorScheme.dark().copyWith(
+              primary: Colors.white,
+              background: Colors.black),
           textTheme: GoogleFonts.pressStart2pTextTheme().apply(
               bodyColor: Colors.white,
               displayColor: Colors.white)),
@@ -40,6 +39,9 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle( // set system navigation bar color to ours
+        SystemUiOverlayStyle.dark.copyWith(
+            systemNavigationBarColor: Theme.of(context).colorScheme.background));
     const List<List<String>> buttons = [
       ['C', '(', ')', '÷',],
       ['7', '8', '9', '×',],
