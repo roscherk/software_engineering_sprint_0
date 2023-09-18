@@ -54,52 +54,10 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
         });
         return; // do not append anything
       } else if (buttonText == 'DEL') {
-        if (currentExpression.length == 2 && currentExpression.startsWith('-')) {
-          setState(() {
-            currentExpression = '';
-          });
-        } else {
-          setState(() {
-            currentExpression =
-                currentExpression.substring(0, currentExpression.length - 1);
-          });
-        }
+        _delButton();
         return; // do not append anything
       } else if (buttonText == '±') {
-        String operators = r'[÷×\-+(]';
-        int index = currentExpression.lastIndexOf(RegExp(operators));
-        debugPrint(index.toString());
-        if (index == -1) {
-          // no operators in currentExpression, so it is just a number
-          setState(() {
-            currentExpression = '--$currentExpression';
-          });
-        } else if (currentExpression[index] == '+') {
-          setState(() {
-            currentExpression = currentExpression.replaceRange(index, index + 1, '-');
-          });
-        } else if (currentExpression[index] == '-') {
-          if (index == 0 || RegExp(operators).hasMatch(currentExpression[index - 1])) {
-            setState(() {
-              currentExpression = currentExpression.replaceRange(index, index + 1, '');
-            });
-          } else {
-            setState(() {
-              currentExpression = currentExpression.replaceRange(index, index + 1, '+');
-            });
-          }
-        } else {
-          setState(() {
-            currentExpression = currentExpression.replaceRange(index + 1, index + 1, '-');
-          });
-        }
-        if (currentExpression.startsWith('-')) {
-          setState(() {
-            currentExpression = currentExpression.substring(1, currentExpression.length);
-          });
-        } else if (!endsWithOperator) {
-
-        }
+        _pmButton();
         return; // do not append anything
       } else if (buttonText == '=') {
         // String expression = currentExpression.replaceAll('÷', '/').replaceAll('×', '*');
@@ -118,7 +76,45 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
   }
 
   void _delButton() {
+    if (currentExpression.length == 2 && currentExpression.startsWith('-')) {
+      setState(() {
+        currentExpression = '';
+      });
+    } else {
+      setState(() {
+        currentExpression =
+            currentExpression.substring(0, currentExpression.length - 1);
+      });
+    }
+  }
 
+  void _pmButton() {
+    String operators = r'[÷×\-+(]';
+    int index = currentExpression.lastIndexOf(RegExp(operators));
+    if (index == -1) {
+      // no operators in currentExpression, so it is just a number
+      setState(() {
+        currentExpression = '-$currentExpression';
+      });
+    } else if (currentExpression[index] == '+') {
+      setState(() {
+        currentExpression = currentExpression.replaceRange(index, index + 1, '-');
+      });
+    } else if (currentExpression[index] == '-') {
+      if (index == 0 || RegExp(operators).hasMatch(currentExpression[index - 1])) {
+        setState(() {
+          currentExpression = currentExpression.replaceRange(index, index + 1, '');
+        });
+      } else {
+        setState(() {
+          currentExpression = currentExpression.replaceRange(index, index + 1, '+');
+        });
+      }
+    } else {
+      setState(() {
+        currentExpression = currentExpression.replaceRange(index + 1, index + 1, '-');
+      });
+    }
   }
 
   @override
