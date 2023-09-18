@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sprint_0_calculator/calc_button.dart';
 
 void main() {
+  var test = SystemUiOverlayStyle.dark.copyWith(systemNavigationBarColor: Colors.transparent);
+  SystemChrome.setSystemUIOverlayStyle(test);
   runApp(const Calculator());
 }
 
@@ -14,18 +17,7 @@ class Calculator extends StatelessWidget {
     return MaterialApp(
       title: 'Calculator',
       theme: ThemeData(
-          colorScheme: const ColorScheme(
-              brightness: Brightness.dark,
-              primary: Colors.white,
-              onPrimary: Colors.black,
-              secondary: Colors.white70,
-              onSecondary: Colors.black26,
-              error: Colors.white38,
-              onError: Colors.deepOrangeAccent,
-              background: Colors.white,
-              onBackground: Colors.white38,
-              surface: Colors.white60,
-              onSurface: Colors.white),
+          colorScheme: const ColorScheme.dark().copyWith(primary: Colors.white),
           textTheme: GoogleFonts.pressStart2pTextTheme()),
       home: const CalculatorHomePage(),
     );
@@ -42,18 +34,99 @@ class CalculatorHomePage extends StatefulWidget {
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String currentExpression = '';
 
-  void _handleButtonTap(String buttonText,) {
-    const List<String> operations = ['C', 'DEL', '±', '÷', '×', '-', '+', '='];
+  // TODO: добавить кнопку, которая ведёт в меню просмотра истории запросов
+  @override
+  Widget build(BuildContext context) {
+    const List<List<String>> buttons = [
+      ['C', '(', ')', '÷',],
+      ['7', '8', '9', '×',],
+      ['4', '5', '6', '-',],
+      ['1', '2', '3', '+',],
+      ['0', '.', '±', '=']
+    ];
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constrains) {
+          var notificationBarHeight = MediaQuery.of(context).viewPadding.top;
+          var availableHeight = constrains.maxHeight - notificationBarHeight - MediaQuery.of(context).viewPadding.bottom;
+          var textBoxSize = availableHeight / 3;
+          var keyboardSize = availableHeight * 2 / 3;
+          var buttonSize = Size(constrains.maxWidth / buttons.first.length, keyboardSize / buttons.length);
+          return Padding(
+            padding: EdgeInsets.only(top: notificationBarHeight),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: constrains.maxWidth,
+                  height: textBoxSize,
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 8, 18, 0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(' HISTORY', style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Colors.white)),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              reverse: true,
+                              child: Text(
+                                currentExpression,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displaySmall!
+                                    .copyWith(color: Colors.white),
+                              ),
+                            ),
+                          )
+                      ),]
+                  )
+                ),
+                SizedBox(
+                    width: constrains.maxWidth,
+                    height: keyboardSize,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Table(
+                        children: List<TableRow>.generate(
+                            buttons.length,
+                                (row) =>
+                                TableRow(
+                                    children: List<CalcButton>.generate(
+                                        buttons.first.length,
+                                            (index) =>
+                                            CalcButton(
+                                                buttonText: buttons[row][index],
+                                                size: buttonSize,
+                                                onPressed: () => _handleButtonPress(buttons[row][index]),
+                                                onLongPress: () => _handleButtonLongPress(buttons[row][index]))
+                                    )
+                                )
+                        ),
+                      ),
+                    )
+                ),
+              ],
+            ),
+          );
+        }
+      ),
+    );
+  }
+
+  void _handleButtonPress(String buttonText,) {
+    const List<String> operations = ['C', '±', '÷', '×', '-', '+', '='];
     bool endsWithOperator = currentExpression.isNotEmpty && operations.sublist(3).contains(currentExpression.substring(currentExpression.length - 1));
     if (operations.contains(buttonText)) {
       if (currentExpression.isEmpty) {
         return; // do not append anything
       } else if (buttonText == 'C') {
-        setState(() {
-          currentExpression = '';
-        });
-        return; // do not append anything
-      } else if (buttonText == 'DEL') {
         _delButton();
         return; // do not append anything
       } else if (buttonText == '±') {
@@ -71,8 +144,17 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
       }
     }
     setState(() {
-      currentExpression += buttonText;
+        currentExpression += buttonText;
     });
+
+  }
+  
+  void _handleButtonLongPress(String buttonText,) {
+    if (buttonText == 'C') {
+      setState(() {
+        currentExpression = '';
+      });
+    }
   }
 
   void _delButton() {
@@ -115,74 +197,5 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
         currentExpression = currentExpression.replaceRange(index + 1, index + 1, '-');
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const List<List<String>> buttons = [
-      ['C', 'DEL', '±', '÷',],
-      ['7', '8', '9', '×',],
-      ['4', '5', '6', '-',],
-      ['1', '2', '3', '+',],
-      ['0', '(', ')', '=']
-    ];
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constrains) {
-          var availableHeight = constrains.maxHeight - MediaQuery.of(context).viewPadding.top - MediaQuery.of(context).viewPadding.bottom;
-          var textBoxSize = availableHeight / 3;
-          var keyboardSize = availableHeight * 2 / 3;
-          var buttonSize = Size(constrains.maxWidth / buttons.first.length, keyboardSize / buttons.length);
-          return Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).viewPadding.top),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: constrains.maxWidth,
-                  height: textBoxSize,
-                  child: Padding(
-                      padding: const EdgeInsets.all(8),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Text(
-                            currentExpression,
-                            style: Theme.of(context)
-                                .textTheme
-                                .displaySmall!
-                                .copyWith(color: Colors.white),
-                          ),
-                        )
-                    )
-                ),
-                SizedBox(
-                    width: constrains.maxWidth,
-                    height: keyboardSize,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Table(
-                        children: List<TableRow>.generate(
-                            buttons.length,
-                                (row) =>
-                                TableRow(
-                                    children: List<CalcButton>.generate(
-                                        buttons.first.length,
-                                            (index) =>
-                                            CalcButton(
-                                                buttonText: buttons[row][index],
-                                                size: buttonSize,
-                                                onPressed: () => _handleButtonTap(buttons[row][index]))
-                                    )
-                                )
-                        ),
-                      ),
-                    )
-                ),
-              ],
-            ),
-          );
-        }
-      ),
-    );
   }
 }

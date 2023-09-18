@@ -4,6 +4,7 @@ class CalcButton extends StatelessWidget {
   final String buttonText;
   final Size size;
   final void Function() onPressed;
+  final void Function()? onLongPress;
   final Color borderColor;
   final Color textColor;
 
@@ -12,15 +13,13 @@ class CalcButton extends StatelessWidget {
         required this.buttonText,
         required this.size,
         required this.onPressed,
-        this.borderColor = Colors.white70,
+        this.onLongPress,
+        this.borderColor = Colors.transparent,
         this.textColor = Colors.white});
 
   @override
   Widget build(BuildContext context) {
-    var textStyle = Theme.of(context).textTheme.headlineSmall!.copyWith(color: textColor);
-    if (size.width <= 100) {  // костыльно, но иначе DEL некрасиво переносится
-      textStyle = Theme.of(context).textTheme.titleMedium!.copyWith(color: textColor);
-    }
+    var textStyle = Theme.of(context).textTheme.headlineMedium!.copyWith(color: textColor);
     return SizedBox(
       width: size.width,
       height: size.height,
@@ -31,6 +30,7 @@ class CalcButton extends StatelessWidget {
                   shape: const BeveledRectangleBorder(),
                   side: BorderSide(color: borderColor)),
               onPressed: onPressed,
+              onLongPress: onLongPress,
               child: FittedBox(
                 fit: BoxFit.contain,
                 child: Text(
