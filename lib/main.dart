@@ -13,7 +13,7 @@ class Calculator extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Calculator',
-      theme: ThemeData(  // это бесполезная штука, которая нигде не используется
+      theme: ThemeData(
           colorScheme: const ColorScheme(
               brightness: Brightness.dark,
               primary: Colors.white,
@@ -44,35 +44,81 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
 
   void _handleButtonTap(String buttonText,) {
     const List<String> operations = ['C', 'DEL', '±', '÷', '×', '-', '+', '='];
+    bool endsWithOperator = currentExpression.isNotEmpty && operations.sublist(3).contains(currentExpression.substring(currentExpression.length - 1));
     if (operations.contains(buttonText)) {
       if (currentExpression.isEmpty) {
-        return;
+        return; // do not append anything
       } else if (buttonText == 'C') {
         setState(() {
           currentExpression = '';
         });
-        return;
+        return; // do not append anything
       } else if (buttonText == 'DEL') {
+        if (currentExpression.length == 2 && currentExpression.startsWith('-')) {
+          setState(() {
+            currentExpression = '';
+          });
+        } else {
+          setState(() {
+            currentExpression =
+                currentExpression.substring(0, currentExpression.length - 1);
+          });
+        }
+        return; // do not append anything
+      } else if (buttonText == '±') {
+        String operators = r'[÷×\-+(]';
+        int index = currentExpression.lastIndexOf(RegExp(operators));
+        debugPrint(index.toString());
+        if (index == -1) {
+          // no operators in currentExpression, so it is just a number
+          setState(() {
+            currentExpression = '--$currentExpression';
+          });
+        } else if (currentExpression[index] == '+') {
+          setState(() {
+            currentExpression = currentExpression.replaceRange(index, index + 1, '-');
+          });
+        } else if (currentExpression[index] == '-') {
+          if (index == 0 || RegExp(operators).hasMatch(currentExpression[index - 1])) {
+            setState(() {
+              currentExpression = currentExpression.replaceRange(index, index + 1, '');
+            });
+          } else {
+            setState(() {
+              currentExpression = currentExpression.replaceRange(index, index + 1, '+');
+            });
+          }
+        } else {
+          setState(() {
+            currentExpression = currentExpression.replaceRange(index + 1, index + 1, '-');
+          });
+        }
+        if (currentExpression.startsWith('-')) {
+          setState(() {
+            currentExpression = currentExpression.substring(1, currentExpression.length);
+          });
+        } else if (!endsWithOperator) {
+
+        }
+        return; // do not append anything
+      } else if (buttonText == '=') {
+        // String expression = currentExpression.replaceAll('÷', '/').replaceAll('×', '*');
+        // TODO: добавить post-запрос на сторону сервиса
+        // TODO: и вывести ответ на экран
+        return; // do not append anything
+      } else if (endsWithOperator) {
         setState(() {
           currentExpression = currentExpression.substring(0, currentExpression.length - 1);
         });
-        return;
-      } else if (buttonText == '±') {
-        //TODO
-        return;
-      } else if (buttonText == '=') {
-        //TODO
-        return;
-      } else if (operations.contains(currentExpression.substring(currentExpression.length - 1))) {
-        setState(() {
-          currentExpression = currentExpression.substring(0, currentExpression.length - 1) + buttonText;
-        });
-        return;
       }
     }
     setState(() {
       currentExpression += buttonText;
     });
+  }
+
+  void _delButton() {
+
   }
 
   @override
