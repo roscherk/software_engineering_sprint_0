@@ -78,7 +78,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
-                          alignment: Alignment.topLeft,
+                          alignment: Alignment.topRight,
                           child: TextButton(
                               onPressed: () {
                                 _navigateToHistory();
