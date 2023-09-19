@@ -13,13 +13,13 @@ class HistoryPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.background,
         body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constrains) {
-          const expressionsOnPage = 8;
+          const expressionsOnPage = 10;
           var notificationBarHeight = MediaQuery.of(context).viewPadding.top;
           var availableHeight = constrains.maxHeight -
               notificationBarHeight -
               MediaQuery.of(context).viewPadding.bottom;
-          var buttonHeight = availableHeight / 10;
-          var expressionListHeight = availableHeight * 9 / 10;
+          var buttonHeight = availableHeight / expressionsOnPage;
+          var expressionListHeight = availableHeight * (expressionsOnPage - 1) / expressionsOnPage;
           return Padding(
             padding: EdgeInsets.only(top: notificationBarHeight),
             child: Column(
@@ -51,21 +51,27 @@ class HistoryPage extends StatelessWidget {
                     scrollDirection: Axis.vertical,
                     children: List.generate(
                         history.length,
-                        (index) => SizedBox(
+                        (index) => SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          reverse: true,
+                          child: SizedBox(
                             height: availableHeight / expressionsOnPage,
-                            child: GestureDetector(
-                              onTap: () {
+                            child: TextButton(
+                              onLongPress: () {
+                                Navigator.pop(context, history[index][0]);
+                              },
+                              onPressed: () {
                                 Navigator.pop(context, history[index][1]);
                               },
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                reverse: true,
+                              child: Align(
+                                alignment: Alignment.centerRight,
                                 child: Text(
                                   '${history[index][0]} = ${history[index][1]}',
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                               ),
-                            )
+                            ),
+                          ),
                         )
                     ),
                   ),
@@ -81,8 +87,8 @@ class HistoryPage extends StatelessWidget {
     // TODO: сделать запрос к серверу и получить список с историей выражений
     // for lulz and testing
     return [
-      ['2 + 2', '4'],
-      ['2 + 2 * 2', '6'],
+      ['2+2', '4'],
+      ['2+2*2', '6'],
       ['request', 'result'],
       ['request', 'result'],
       ['Very-very-very-very-very-very-very request', 'result'],
