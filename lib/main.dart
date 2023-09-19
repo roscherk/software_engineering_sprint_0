@@ -74,22 +74,6 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                   height: textBoxSize,
                   child: Stack(
                     children: [
-                      // History button
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: TextButton(
-                              onPressed: () {
-                                _navigateToHistory();
-                              },
-                              style: TextButton.styleFrom(
-                                shape: const BeveledRectangleBorder(),
-                                side: const BorderSide(color: Colors.transparent),
-                              ),
-                              child: Text('HISTORY', style: Theme.of(context).textTheme.headlineSmall)),
-                        ),
-                      ),
                       // Textbox for expression
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -109,29 +93,38 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                   )
                 ),
                 // Keyboard
-                SizedBox(
-                    width: constrains.maxWidth,
-                    height: keyboardSize,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Table(
-                        children: List<TableRow>.generate(
-                            buttons.length,
-                                (row) =>
-                                TableRow(
-                                    children: List<CalcButton>.generate(
-                                        buttons.first.length,
-                                            (index) =>
-                                            CalcButton(
-                                                buttonText: buttons[row][index],
-                                                size: buttonSize,
-                                                onPressed: () => _handleButtonPress(buttons[row][index]),
-                                                onLongPress: () => _handleButtonLongPress(buttons[row][index]))
-                                    )
-                                )
+                GestureDetector(
+                  onPanUpdate: (details) {
+                    const xSensitivity = 8;
+                    const ySensitivity = 4;
+                    if (details.delta.dx >= xSensitivity && details.delta.dy.abs() <= ySensitivity) {
+                      _navigateToHistory();
+                    }
+                  },
+                  child: SizedBox(
+                      width: constrains.maxWidth,
+                      height: keyboardSize,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Table(
+                          children: List<TableRow>.generate(
+                              buttons.length,
+                                  (row) =>
+                                  TableRow(
+                                      children: List<CalcButton>.generate(
+                                          buttons.first.length,
+                                              (index) =>
+                                              CalcButton(
+                                                  buttonText: buttons[row][index],
+                                                  size: buttonSize,
+                                                  onPressed: () => _handleButtonPress(buttons[row][index]),
+                                                  onLongPress: () => _handleButtonLongPress(buttons[row][index]))
+                                      )
+                                  )
+                          ),
                         ),
-                      ),
-                    )
+                      )
+                  ),
                 ),
               ],
             ),

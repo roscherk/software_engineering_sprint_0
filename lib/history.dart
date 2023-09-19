@@ -46,35 +46,46 @@ class HistoryPage extends StatelessWidget {
                   ),
                 ),
                 // Requests list
-                SizedBox(
-                  height: expressionListHeight,
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    scrollDirection: Axis.vertical,
-                    children: List.generate(
-                        history.length,
-                        (index) => SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          reverse: true,
-                          child: SizedBox(
-                            height: availableHeight / expressionsOnPage,
-                            child: TextButton(
-                              onLongPress: () {
-                                Navigator.pop(context, history[index][0]);
-                              },
-                              onPressed: () {
-                                Navigator.pop(context, history[index][1]);
-                              },
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  '${history[index][0]} = ${history[index][1]}',
-                                  style: Theme.of(context).textTheme.titleLarge,
+                GestureDetector(
+                  onPanUpdate: (details) {
+                    debugPrint('dx: ${details.delta.dx.toString()}');
+                    debugPrint('dy: ${details.delta.dy.abs().toString()}');
+                    const xSensitivity = 8;
+                    const ySensitivity = 4;
+                    if (details.delta.dx <= -xSensitivity && details.delta.dy.abs() <= ySensitivity) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: SizedBox(
+                    height: expressionListHeight,
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      scrollDirection: Axis.vertical,
+                      children: List.generate(
+                          history.length,
+                          (index) => SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            reverse: true,
+                            child: SizedBox(
+                              height: availableHeight / expressionsOnPage,
+                              child: TextButton(
+                                onLongPress: () {
+                                  Navigator.pop(context, history[index][0]);
+                                },
+                                onPressed: () {
+                                  Navigator.pop(context, history[index][1]);
+                                },
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    '${history[index][0]} = ${history[index][1]}',
+                                    style: Theme.of(context).textTheme.titleLarge,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        )
+                          )
+                      ),
                     ),
                   ),
                 )
