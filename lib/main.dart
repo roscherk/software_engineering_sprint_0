@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,6 +15,7 @@ class Calculator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Calculator',
       theme: ThemeData(
           colorScheme: const ColorScheme.dark().copyWith(
@@ -36,15 +38,16 @@ class CalculatorHomePage extends StatefulWidget {
 }
 
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
-  String currentExpression = '';
-  TextStyle? expressionStyle;
+  String _currentExpression = '';
+  TextStyle? _expressionStyle;
+  // Future<String>? _futureExpression;
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle( // set system navigation bar color to ours
         SystemUiOverlayStyle.dark.copyWith(
             systemNavigationBarColor: Theme.of(context).colorScheme.background));
-    expressionStyle ??= Theme.of(context).textTheme.displaySmall;
+    _expressionStyle ??= Theme.of(context).textTheme.displaySmall;
     const List<List<String>> buttons = [
       ['C', '(', ')', '÷',],
       ['7', '8', '9', '×',],
@@ -95,8 +98,8 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
                               scrollDirection: Axis.horizontal,
                               reverse: true,
                               child: Text(
-                                currentExpression,
-                                style: expressionStyle,
+                                _currentExpression,
+                                style: _expressionStyle,
                               ),
                             ),
                           )
@@ -137,6 +140,18 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     );
   }
 
+  Future<String> _sendExpressionQuery(String expression) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8080/calc'),
+      body: expression,
+    );
+    debugPrint(response.body);
+    setState(() {
+      _currentExpression = response.body;
+    });
+    return response.body;
+  }
+
   Future<void> _navigateToHistory() async {
     var result = await Navigator.push(
       context,
@@ -144,16 +159,16 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     );
     if (result.toString().isNotEmpty) {
       setState(() {
-        currentExpression = result.toString();
+        _currentExpression = result.toString();
       });
     }
   }
 
   void _handleButtonPress(String buttonText,) {
     const List<String> operations = ['C', '±', '÷', '×', '-', '+', '='];
-    bool endsWithOperator = currentExpression.isNotEmpty && operations.sublist(3).contains(currentExpression.substring(currentExpression.length - 1));
+    bool endsWithOperator = _currentExpression.isNotEmpty && operations.sublist(3).contains(_currentExpression.substring(_currentExpression.length - 1));
     if (operations.contains(buttonText)) {
-      if (currentExpression.isEmpty) {
+      if (_currentExpression.isEmpty) {
         return; // do not append anything
       } else if (buttonText == 'C') {
         _delButton();
@@ -162,37 +177,37 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
         _pmButton();
         return; // do not append anything
       } else if (buttonText == '=') {
-        // String expression = currentExpression.replaceAll('÷', '/').replaceAll('×', '*');
-        // TODO: добавить post-запрос на сторону сервиса
-        // TODO: и вывести ответ на экран
+        setState(() {
+          _sendExpressionQuery(_currentExpression.replaceAll('÷', '/').replaceAll('×', '*'));
+        });
         return; // do not append anything
       } else if (endsWithOperator) {
         setState(() {
-          currentExpression = currentExpression.substring(0, currentExpression.length - 1);
+          _currentExpression = _currentExpression.substring(0, _currentExpression.length - 1);
         });
       }
     }
     setState(() {
-        currentExpression += buttonText;
+        _currentExpression += buttonText;
     });
   }
 
   void _handleButtonLongPress(String buttonText,) {
     if (buttonText == 'C') {
       setState(() {
-        currentExpression = '';
+        _currentExpression = '';
       });
     }
-    if (currentExpression == '42' && buttonText == '=') {
-      if (expressionStyle == Theme.of(context).textTheme.displaySmall) {
-        expressionStyle = Theme.of(context).textTheme.titleMedium;
+    if (_currentExpression == '42' && buttonText == '=') {
+      if (_expressionStyle == Theme.of(context).textTheme.displaySmall) {
+        _expressionStyle = Theme.of(context).textTheme.titleMedium;
         setState(() {
           // Theme.of(context).textTheme = GoogleFonts.textMeOneTextTheme;
-          currentExpression = 'heapof&gvozd design';
+          _currentExpression = 'heapof&gvozd design';
         });
       } else {
         setState(() {
-          expressionStyle = Theme.of(context).textTheme.displaySmall;
+          _expressionStyle = Theme.of(context).textTheme.displaySmall;
         });
       }
       // expressionStyle = currentStyle;
@@ -200,43 +215,43 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
   }
 
   void _delButton() {
-    if (currentExpression.length == 2 && currentExpression.startsWith('-')) {
+    if (_currentExpression.length == 2 && _currentExpression.startsWith('-')) {
       setState(() {
-        currentExpression = '';
+        _currentExpression = '';
       });
     } else {
       setState(() {
-        currentExpression =
-            currentExpression.substring(0, currentExpression.length - 1);
+        _currentExpression =
+            _currentExpression.substring(0, _currentExpression.length - 1);
       });
     }
   }
 
   void _pmButton() {
     String operators = r'[÷×\-+(]';
-    int index = currentExpression.lastIndexOf(RegExp(operators));
+    int index = _currentExpression.lastIndexOf(RegExp(operators));
     if (index == -1) {
       // no operators in currentExpression, so it is just a number
       setState(() {
-        currentExpression = '-$currentExpression';
+        _currentExpression = '-$_currentExpression';
       });
-    } else if (currentExpression[index] == '+') {
+    } else if (_currentExpression[index] == '+') {
       setState(() {
-        currentExpression = currentExpression.replaceRange(index, index + 1, '-');
+        _currentExpression = _currentExpression.replaceRange(index, index + 1, '-');
       });
-    } else if (currentExpression[index] == '-') {
-      if (index == 0 || RegExp(operators).hasMatch(currentExpression[index - 1])) {
+    } else if (_currentExpression[index] == '-') {
+      if (index == 0 || RegExp(operators).hasMatch(_currentExpression[index - 1])) {
         setState(() {
-          currentExpression = currentExpression.replaceRange(index, index + 1, '');
+          _currentExpression = _currentExpression.replaceRange(index, index + 1, '');
         });
       } else {
         setState(() {
-          currentExpression = currentExpression.replaceRange(index, index + 1, '+');
+          _currentExpression = _currentExpression.replaceRange(index, index + 1, '+');
         });
       }
     } else {
       setState(() {
-        currentExpression = currentExpression.replaceRange(index + 1, index + 1, '-');
+        _currentExpression = _currentExpression.replaceRange(index + 1, index + 1, '-');
       });
     }
   }
