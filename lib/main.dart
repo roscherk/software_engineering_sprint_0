@@ -42,7 +42,6 @@ class CalculatorHomePage extends StatefulWidget {
 class _CalculatorHomePageState extends State<CalculatorHomePage> {
   String _currentExpression = '';
   TextStyle? _expressionStyle;
-  // Future<String>? _futureExpression;
 
   @override
   Widget build(BuildContext context) {
