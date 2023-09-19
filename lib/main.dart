@@ -147,9 +147,16 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
         Uri.parse('http://${Calculator.serverIP}:${Calculator.serverPort}/calc'),
         body: expression,
       );
-      setState(() {
-        _currentExpression = response.body;
-      });
+      if (response.body.isNotEmpty) {
+        setState(() {
+          _currentExpression = response.body;
+        });
+      } else {
+        setState(() {
+          _currentExpression = "error";
+        });
+      }
+
     } catch (exception, stackTrace) {
       debugPrintStack(stackTrace: stackTrace, label: exception.toString());
     }
