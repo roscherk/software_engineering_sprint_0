@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -34,7 +33,7 @@ class HistoryPage extends StatelessWidget {
                       alignment: Alignment.topLeft,
                       child: TextButton(
                           onPressed: () {
-                            Navigator.pop(context, '');
+                            Navigator.pop(context);
                           },
                           style: TextButton.styleFrom(
                             shape: const BeveledRectangleBorder(),
@@ -63,7 +62,7 @@ class HistoryPage extends StatelessWidget {
                                 reverse: true,
                                 child: Text(
                                   '${history[index][0]} = ${history[index][1]}',
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                  style: Theme.of(context).textTheme.titleLarge,
                                 ),
                               ),
                             )

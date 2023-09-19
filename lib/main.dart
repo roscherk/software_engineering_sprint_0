@@ -11,6 +11,8 @@ void main() {
 
 class Calculator extends StatelessWidget {
   const Calculator({super.key});
+  static const serverIP = 'calculator@93.95.97.57';
+  static const serverPort = '8080';
 
   @override
   Widget build(BuildContext context) {
@@ -140,16 +142,18 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
     );
   }
 
-  Future<String> _sendExpressionQuery(String expression) async {
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/calc'),
-      body: expression,
-    );
-    debugPrint(response.body);
-    setState(() {
-      _currentExpression = response.body;
-    });
-    return response.body;
+  void _evaluateExpression(String expression) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://${Calculator.serverIP}:${Calculator.serverPort}/calc'),
+        body: expression,
+      );
+      setState(() {
+        _currentExpression = response.body;
+      });
+    } catch (exception, stackTrace) {
+      debugPrintStack(stackTrace: stackTrace, label: exception.toString());
+    }
   }
 
   Future<void> _navigateToHistory() async {
@@ -157,7 +161,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
       context,
       MaterialPageRoute(builder: (context) => const HistoryPage()),
     );
-    if (result.toString().isNotEmpty) {
+    if (result != null) {
       setState(() {
         _currentExpression = result.toString();
       });
@@ -178,7 +182,7 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
         return; // do not append anything
       } else if (buttonText == '=') {
         setState(() {
-          _sendExpressionQuery(_currentExpression.replaceAll('÷', '/').replaceAll('×', '*'));
+          _evaluateExpression(_currentExpression.replaceAll('÷', '/').replaceAll('×', '*'));
         });
         return; // do not append anything
       } else if (endsWithOperator) {
