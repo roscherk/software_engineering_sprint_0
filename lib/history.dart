@@ -100,7 +100,7 @@ class HistoryPage extends StatelessWidget {
       ['request', 'result'],
       ['request', 'result'],
       ['request', 'result'],
-      ['request', 'result'],
+      ['Very-very-very-very-very-very-very request', 'result'],
       ['request', 'result'],
       ['request', 'result'],
       ['request', 'result'],
